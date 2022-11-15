@@ -34,7 +34,7 @@
                        (java.net.URLClassLoader/newInstance))]
     (.setContextClassLoader (Thread/currentThread) (clojure.lang.DynamicClassLoader. class-loader))
     (in-ns 'user)
-    (apply (ns-resolve (doto 'cljd.build require) '-main) '[watch])))
+    (apply (ns-resolve (doto 'cljd.build require) '-main) '["watch"])))
 
 (comment
 
