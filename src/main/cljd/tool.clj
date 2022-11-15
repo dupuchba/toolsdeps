@@ -23,6 +23,9 @@
                 (assoc master-edn
                   :extra {:aliases {:cljdd {:main-opts ["-m" "cljd.build"]}}}
                   :aliases [:cljdd]))
+        _ (deps/prep-libs! (:libs (:basis basis)) {:action :prep
+                                                   :log :info
+                                                   :current false} (:basis basis))
         class-loader (->> basis
                        :basis
                        :classpath-roots
@@ -48,6 +51,9 @@
                 (assoc master-edn
                   :extra {:aliases {:cljdd {:main-opts ["-m" "cljd.build"]}}}
                   :aliases [:cljdd]))
+        _ (deps/prep-libs! (:libs (:basis basis)) {:action :prep
+                                                   :log :info
+                                                   :current false} (:basis basis))
         class-loader (->> basis
                        :basis
                        :classpath-roots
@@ -57,9 +63,8 @@
                                         .toURL)))
                        (into-array java.net.URL)
                        (java.net.URLClassLoader/newInstance))]
-    (.setContextClassLoader (Thread/currentThread) (clojure.lang.DynamicClassLoader. class-loader))
-    (in-ns 'user)
-    (apply (ns-resolve (doto 'cljd.build require) '-main) '[watch]))
+
+    "d")
 
 
 
