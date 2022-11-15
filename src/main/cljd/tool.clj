@@ -8,28 +8,59 @@
 
 (ns cljd.tool
   (:require [clojure.tools.deps.alpha :as deps]
-            [clojure.tools.deps.alpha.util.session :as session]))
+            [clojure.tools.deps.alpha.util.session :as session]
+            [clojure.tools.cli.api :as api])
+  (:import (java.net URL)))
 
 (defn -main [& args]
   (let [{:keys [root-edn user-edn project-edn]} (deps/find-edn-maps)
         master-edn (deps/merge-edns [root-edn user-edn project-edn])
-        combined-aliases (deps/combine-aliases master-edn [:cljd])
-        basis (session/with-session
-                (deps/calc-basis master-edn {:resolve-args (merge combined-aliases {:trace true})
-                                             :classpath-args combined-aliases}))]
-
-    (println (:classpath-roots basis))))
+        #_#_combined-aliases (deps/combine-aliases master-edn [:cljd])
+        #_#_basis (session/with-session
+                    (deps/calc-basis master-edn {:resolve-args (merge combined-aliases {:trace true})
+                                                 :classpath-args combined-aliases}))
+        basis (api/basis
+                (assoc master-edn
+                  :extra {:aliases {:cljdd {:main-opts ["-m" "cljd.build"]}}}
+                  :aliases [:cljdd]))
+        class-loader (->> basis
+                       :basis
+                       :classpath-roots
+                       (into [] (map #(-> %
+                                        java.io.File.
+                                        .toURI
+                                        .toURL)))
+                       (into-array java.net.URL)
+                       (java.net.URLClassLoader/newInstance))]
+    (.setContextClassLoader (Thread/currentThread) (clojure.lang.DynamicClassLoader. class-loader))
+    (in-ns 'user)
+    (apply (ns-resolve (doto 'cljd.build require) '-main) '[watch])))
 
 (comment
 
   (let [{:keys [root-edn user-edn project-edn]} (deps/find-edn-maps)
         master-edn (deps/merge-edns [root-edn user-edn project-edn])
-        combined-aliases (deps/combine-aliases master-edn [:cljd])
-        basis (session/with-session
-                (deps/calc-basis master-edn {:resolve-args (merge combined-aliases {:trace true})
-                                             :classpath-args combined-aliases}))]
+        #_#_combined-aliases (deps/combine-aliases master-edn [:cljd])
+        #_#_basis (session/with-session
+                    (deps/calc-basis master-edn {:resolve-args (merge combined-aliases {:trace true})
+                                                 :classpath-args combined-aliases}))
+        basis (api/basis
+                (assoc master-edn
+                  :extra {:aliases {:cljdd {:main-opts ["-m" "cljd.build"]}}}
+                  :aliases [:cljdd]))
+        class-loader (->> basis
+                       :basis
+                       :classpath-roots
+                       (into [] (map #(-> %
+                                        java.io.File.
+                                        .toURI
+                                        .toURL)))
+                       (into-array java.net.URL)
+                       (java.net.URLClassLoader/newInstance))]
+    (.setContextClassLoader (Thread/currentThread) (clojure.lang.DynamicClassLoader. class-loader))
+    (in-ns 'user)
+    (apply (ns-resolve (doto 'cljd.build require) '-main) '[watch]))
 
-    (:classpath-roots basis))
 
 
   )
