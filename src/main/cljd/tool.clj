@@ -33,7 +33,7 @@
   (apply (ns-resolve (doto 'cljd.build require) '-main) (into ["compile"] (map name) args)))
 
 (defn flutter [& args]
-  (print args)
+  (println args)
   (init-project)
   (in-ns 'user)
   (apply (ns-resolve (doto 'cljd.build require) '-main) (into ["flutter"] (map name) args)))
