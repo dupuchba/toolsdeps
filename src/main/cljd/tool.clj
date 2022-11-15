@@ -23,27 +23,28 @@
     (.setContextClassLoader (Thread/currentThread) (clojure.lang.DynamicClassLoader. class-loader))))
 
 (defn watch [& args]
-  (init-projet)
+  (init-project)
   (in-ns 'user)
   (apply (ns-resolve (doto 'cljd.build require) '-main) (into ["watch"] (map name) args)))
 
 (defn compile [& args]
-  (init-projet)
+  (init-project)
   (in-ns 'user)
   (apply (ns-resolve (doto 'cljd.build require) '-main) (into ["compile"] (map name) args)))
 
 (defn flutter [& args]
-  (init-projet)
+  (print args)
+  (init-project)
   (in-ns 'user)
   (apply (ns-resolve (doto 'cljd.build require) '-main) (into ["flutter"] (map name) args)))
 
 (defn init [& args]
-  (init-projet)
+  (init-project)
   (in-ns 'user)
   (apply (ns-resolve (doto 'cljd.build require) '-main) (into ["init"] (map name) args)))
 
 (defn clean []
-  (init-projet)
+  (init-project)
   (in-ns 'user)
   (apply (ns-resolve (doto 'cljd.build require) '-main) ["clean"]))
 
