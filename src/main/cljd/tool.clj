@@ -22,6 +22,10 @@
                        (java.net.URLClassLoader/newInstance))]
     (.setContextClassLoader (Thread/currentThread) (clojure.lang.DynamicClassLoader. class-loader))))
 
+(defn -main [& args]
+  (println "MAIN")
+  (println args))
+
 (defn watch [& args]
   (init-project)
   (in-ns 'user)
