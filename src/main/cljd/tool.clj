@@ -1,28 +1,13 @@
-;   Copyright (c) Rich Hickey. All rights reserved.
-;   The use and distribution terms for this software are covered by the
-;   Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
-;   which can be found in the file epl-v10.html at the root of this distribution.
-;   By using this software in any fashion, you are agreeing to be bound by
-;   the terms of this license.
-;   You must not remove this notice, or any other, from this software.
-
 (ns cljd.tool
   (:require [clojure.tools.deps.alpha :as deps]
             [clojure.tools.deps.alpha.util.session :as session]
             [clojure.tools.cli.api :as api])
   (:import (java.net URL)))
 
-(defn -main [& args]
+(defn init-project []
   (let [{:keys [root-edn user-edn project-edn]} (deps/find-edn-maps)
         master-edn (deps/merge-edns [root-edn user-edn project-edn])
-        #_#_combined-aliases (deps/combine-aliases master-edn [:cljd])
-        #_#_basis (session/with-session
-                    (deps/calc-basis master-edn {:resolve-args (merge combined-aliases {:trace true})
-                                                 :classpath-args combined-aliases}))
-        basis (api/basis
-                (assoc master-edn
-                  :extra {:aliases {:cljdd {:main-opts ["-m" "cljd.build"]}}}
-                  :aliases [:cljdd]))
+        basis (api/basis master-edn)
         _ (deps/prep-libs! (:libs (:basis basis)) {:action :prep
                                                    :log :info
                                                    :current false} (:basis basis))
@@ -35,9 +20,32 @@
                                         .toURL)))
                        (into-array java.net.URL)
                        (java.net.URLClassLoader/newInstance))]
-    (.setContextClassLoader (Thread/currentThread) (clojure.lang.DynamicClassLoader. class-loader))
-    (in-ns 'user)
-    (apply (ns-resolve (doto 'cljd.build require) '-main) '["watch"])))
+    (.setContextClassLoader (Thread/currentThread) (clojure.lang.DynamicClassLoader. class-loader))))
+
+(defn watch [& args]
+  (init-projet)
+  (in-ns 'user)
+  (apply (ns-resolve (doto 'cljd.build require) '-main) (into ["watch"] (map name) args)))
+
+(defn compile [& args]
+  (init-projet)
+  (in-ns 'user)
+  (apply (ns-resolve (doto 'cljd.build require) '-main) (into ["compile"] (map name) args)))
+
+(defn flutter [& args]
+  (init-projet)
+  (in-ns 'user)
+  (apply (ns-resolve (doto 'cljd.build require) '-main) (into ["flutter"] (map name) args)))
+
+(defn init [& args]
+  (init-projet)
+  (in-ns 'user)
+  (apply (ns-resolve (doto 'cljd.build require) '-main) (into ["init"] (map name) args)))
+
+(defn clean []
+  (init-projet)
+  (in-ns 'user)
+  (apply (ns-resolve (doto 'cljd.build require) '-main) ["clean"]))
 
 (comment
 
@@ -63,8 +71,7 @@
                                         .toURL)))
                        (into-array java.net.URL)
                        (java.net.URLClassLoader/newInstance))]
-
-    "d")
+    )
 
 
 
