@@ -6,6 +6,30 @@
 ;   the terms of this license.
 ;   You must not remove this notice, or any other, from this software.
 
-(ns cljd.tool)
+(ns cljd.tool
+  (:require [clojure.tools.deps.alpha :as deps]
+            [clojure.tools.deps.alpha.util.session :as session]))
 
-(defn -main [& args] (println "Coucou la famille"))
+(defn -main [& args]
+  (let [{:keys [root-edn user-edn project-edn]} (deps/find-edn-maps)
+        master-edn (deps/merge-edns [root-edn user-edn project-edn])
+        combined-aliases (deps/combine-aliases master-edn [:cljd])
+        basis (session/with-session
+                (deps/calc-basis master-edn {:resolve-args (merge combined-aliases {:trace true})
+                                             :classpath-args combined-aliases}))]
+
+    (println (:classpath-roots basis))))
+
+(comment
+
+  (let [{:keys [root-edn user-edn project-edn]} (deps/find-edn-maps)
+        master-edn (deps/merge-edns [root-edn user-edn project-edn])
+        combined-aliases (deps/combine-aliases master-edn [:cljd])
+        basis (session/with-session
+                (deps/calc-basis master-edn {:resolve-args (merge combined-aliases {:trace true})
+                                             :classpath-args combined-aliases}))]
+
+    (:classpath-roots basis))
+
+
+  )

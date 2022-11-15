@@ -1,3 +1,4 @@
 {:paths ["src/main/"]
  :tools/usage {:ns-default cljd.tool}
+ :deps {org.clojure/tools.deps.alpha {:mvn/version "0.15.1254"}}
  :aliases {:cljd {:main-opts ["-m" "cljd.build"]}}}
