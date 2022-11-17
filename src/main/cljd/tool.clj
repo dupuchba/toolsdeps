@@ -23,8 +23,8 @@
     (.setContextClassLoader (Thread/currentThread) (clojure.lang.DynamicClassLoader. class-loader))))
 
 (defn -main [& args]
-  (println "MAIN")
-  (println args))
+  (prn "MAIN")
+  (prn args))
 
 (defn watch [& args]
   (init-project)
@@ -54,6 +54,8 @@
 
 (comment
 
+  ;; clj -Tcljd flutter :args []
+
   (let [{:keys [root-edn user-edn project-edn]} (deps/find-edn-maps)
         master-edn (deps/merge-edns [root-edn user-edn project-edn])
         #_#_combined-aliases (deps/combine-aliases master-edn [:cljd])
@@ -76,8 +78,5 @@
                                         .toURL)))
                        (into-array java.net.URL)
                        (java.net.URLClassLoader/newInstance))]
-    )
-
-
-
+    (:deps (:basis basis)))
   )
