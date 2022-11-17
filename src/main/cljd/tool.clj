@@ -24,7 +24,10 @@
 
 (defn -main [& args]
   (prn "MAIN")
-  (prn args))
+  (prn args)
+  (init-project)
+  (in-ns 'user)
+  (apply (ns-resolve (doto 'cljd.build require) '-main) (into ["watch"] (map name) args)))
 
 (defn watch [& args]
   (init-project)
