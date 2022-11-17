@@ -22,17 +22,17 @@
                        (java.net.URLClassLoader/newInstance))]
     (.setContextClassLoader (Thread/currentThread) (clojure.lang.DynamicClassLoader. class-loader))))
 
-(defn -main [& args]
+(defn -main [args]
   (prn "MAIN")
   (prn args)
   (init-project)
   (in-ns 'user)
-  (apply (ns-resolve (doto 'cljd.build require) '-main) (into ["watch"] (map name) args)))
+  (apply (ns-resolve (doto 'cljd.build require) '-main) ["watch"] #_(into  (map name) args)))
 
-(defn watch [& args]
+(defn watch [args]
   (init-project)
   (in-ns 'user)
-  (apply (ns-resolve (doto 'cljd.build require) '-main) (into ["watch"] (map name) args)))
+  #_(apply (ns-resolve (doto 'cljd.build require) '-main) (into ["watch"] (mapcat #(vecto (name (key %)) (name  ))) (:args args))))
 
 (defn compile [& args]
   (init-project)
